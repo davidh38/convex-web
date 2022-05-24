@@ -404,13 +404,16 @@
     (merge tx {:convex-web.transaction/result (result-data result)})))
 
 (defn block-data [^Peer peer ^Long index ^Block block]
+  (println :block (.getTimeStamp block))
   #:convex-web.block 
   {:index index
    :timestamp (.getTimeStamp block)
+   ; TODOO
    :peer (.toChecksumHex (.getPeer block))
    :transactions
    (map-indexed
      (fn [^Long tx-index ^SignedData signed-data]
+       (println :here tx-index signed-data)
        (let [^ATransaction transaction (.getValue signed-data)]
          #:convex-web.signed-data 
          {:address (.longValue (.getOrigin transaction))
@@ -429,7 +432,8 @@
 
     (reduce
       (fn [blocks index]
-        (conj blocks (block-data peer index (.getBlock order index))))
+        (println :got [blocks index] (.getBlock order index))
+        (conj blocks (block-data peer index (.getValue (.getBlock order index)))))
       []
       (range start end))))
 
